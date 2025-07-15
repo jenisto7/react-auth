@@ -16,19 +16,32 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const res = await axios.post('https://reqres.in/api/login', {
-        email,
-        password,
-      });
+      const res = await axios.post(
+        'https://reqres.in/api/login', 
+        { email,
+          password,
+         }, {
+          headers: {
+            'x-api-Key': 'reqres-free-v1'
+          }
+         });
 
+      if (res.data.token) {
       localStorage.setItem('token', res.data.token);
       if (remember) {
         localStorage.setItem('remember', 'true');
       }
       toast.success('Login Successful');
+
+      setTimeout(() => {
       navigate('/dashboard');
-    } catch (error) {
-      toast.error('Login Failed: Invalid Credentials');
+      }, 1500);
+    } else {
+      toast.error('Login failed: No token received');
+    }
+     } catch (error) {
+      const message = error.response?.data?.error || 'Something went wrong. Please try again.';
+      toast.error(`Login Failed: ${message}`);
     } finally {
       setLoading(false);
     }
